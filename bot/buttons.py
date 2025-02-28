@@ -2,10 +2,10 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 from bot.handlers.filter import ModeratorFilter
 
 from bot.constants import ModeratorMenuButtons, UserMenuButtons
-from bot.models import Crossing
 from bot.models.crossing_config import CrossingConfig
 from aiogram import types
 from bot.constants.base import AppStringEnum
+from bot.models.camera import Camera
 
 
 def admin_menu_keyboard():
@@ -51,20 +51,11 @@ def manager_menu_keyboard():
     return keyboard
 
 
-def user_crossings_keyboard(crossings: list[Crossing]):
+def user_cameras_keyboard(cameras: list[Camera]):
     builder = InlineKeyboardBuilder()
-    for crossing in crossings:
-        builder.button(text=crossing.name, callback_data=f"crossing_{crossing.id}")
-    builder.button(text="Сохранить", callback_data="save_crossings")
-    builder.adjust(1)
-    keyboard = builder.as_markup()
-    return keyboard
-
-
-def user_camera_crossings_keyboard(crossings: list[Crossing]):
-    builder = InlineKeyboardBuilder()
-    for crossing in crossings:
-        builder.button(text=crossing.name, callback_data=f"crossing_{crossing.id}")
+    for camera in cameras:
+        builder.button(text=camera.name, url=camera.camera_url)
+    builder.button(text="Назад", callback_data="back_to_user_menu")
     builder.adjust(1)
     keyboard = builder.as_markup()
     return keyboard

@@ -2,12 +2,11 @@ import asyncio
 
 from repository.appeal_repository import AppealRepository
 from repository.base import BaseRepository
-from repository.crossing_repository import CrossingRepository
+from repository.cameras_repository import CamerasRepository
 from repository.message_templates import MessageTemplatesRepository
-from repository.user_crossings import UserCrossingsRepository
 from repository.user_repository import UserRepository
 from repository.messages import MessagesRepository
-from repository.crossing_config import CrossingConfigRepository
+from repository.crossing_config_repository import CrossingConfigRepository
 
 
 async def create_tables():
@@ -19,10 +18,9 @@ asyncio.run(create_tables())
 __all__ = [
     "UserRepository",
     "AppealRepository",
-    "CrossingRepository",
+    "CamerasRepository",
     "BaseRepository",
     "MessageTemplatesRepository",
-    "UserCrossingsRepository",
     "MessagesRepository",
 
     "CrossingConfigRepository",

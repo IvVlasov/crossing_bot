@@ -15,6 +15,29 @@ def winter_crossing_keyboard():
     return keyboard
 
 
+def summer_crossing_keyboard():
+    builder = InlineKeyboardBuilder()
+    builder.button(text="1", callback_data="summer_crossing_1")
+    builder.button(text="2", callback_data="summer_crossing_2")
+    builder.button(text="3", callback_data="summer_crossing_3")
+    builder.button(text="4", callback_data="summer_crossing_4")
+    builder.button(text="6", callback_data="summer_crossing_6")
+    builder.adjust(1)
+    keyboard = builder.as_markup()
+    return keyboard
+
+
+def interseason_crossing_keyboard():
+    builder = InlineKeyboardBuilder()
+    builder.button(text="1", callback_data="interseason_crossing_1")
+    builder.button(text="2", callback_data="interseason_crossing_2")
+    builder.button(text="3", callback_data="interseason_crossing_3")
+    builder.button(text="4", callback_data="interseason_crossing_4")
+    builder.adjust(1)
+    keyboard = builder.as_markup()
+    return keyboard
+
+
 def confirm_keyboard():
     builder = InlineKeyboardBuilder()
     builder.button(text="Подтвердить", callback_data="confirm_yes")

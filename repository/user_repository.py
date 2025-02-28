@@ -1,4 +1,4 @@
-from bot.models import User
+from bot.models import User, NotificationType
 from repository.base import BaseRepository
 
 
@@ -9,7 +9,7 @@ class UserRepository(BaseRepository):
         create_table_query = f"""
             CREATE TABLE IF NOT EXISTS {self.table_name} (
                 chat_id BIGINT PRIMARY KEY,
-                crossings TEXT NOT NULL
+                notification_type TEXT DEFAULT NULL
             )
         """
         await self.execute(create_table_query)
@@ -20,3 +20,13 @@ class UserRepository(BaseRepository):
     async def get_user(self, chat_id: int) -> User | None:
         result = await self.select_one(chat_id=chat_id)
         return User(**result) if result else None
+
+    async def update_user(self, chat_id: int, **kwargs):
+        await self.update(
+            set_conditions=kwargs,
+            chat_id=chat_id,
+        )
+
+    async def get_users_with_notification_type(self, notification_type: NotificationType) -> list[User]:
+        result = await self.select_all(notification_type=notification_type)
+        return [User(**row) for row in result]

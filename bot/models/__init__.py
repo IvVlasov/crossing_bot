@@ -1,5 +1,5 @@
-from bot.models.crossing import Crossing
+from bot.models.camera import Camera
 from bot.models.manager_link import ManagerLink
-from bot.models.user import User
+from bot.models.user import User, NotificationType
 
-__all__ = ["User", "ManagerLink", "Crossing"]
+__all__ = ["User", "ManagerLink", "Camera", "NotificationType"]

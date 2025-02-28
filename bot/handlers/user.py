@@ -1,24 +1,24 @@
 from aiogram import F, Router, types
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
+from bot.handlers.states import NotificationStates
 
 from bot import buttons
 from bot.constants import UserMenuButtons, NotificationTimeButtons
 from bot.handlers.filter import ModeratorFilter
-from bot.models import Crossing, User
+from bot.models import User, NotificationType
 from bot.services.message_service import get_message_service
-from repository import (CrossingRepository, UserCrossingsRepository, CrossingConfigRepository,
-                        UserRepository)
+from repository import CrossingConfigRepository, UserRepository, CamerasRepository
 
 user_router = Router()
 
 
-class UserCrossingsStates(StatesGroup):
-    crossing_choice = State()
+# class UserCrossingsStates(StatesGroup):
+#     crossing_choice = State()
 
 
-class UserCrossingsCamerasStates(StatesGroup):
-    crossing_choice = State()
+# class UserCrossingsCamerasStates(StatesGroup):
+#     crossing_choice = State()
 
 
 @user_router.message(ModeratorFilter(), F.text.startswith("/start"))
@@ -69,8 +69,34 @@ async def state_now(message: types.Message, state: FSMContext, user: User):
 
 @user_router.message(F.text == UserMenuButtons.ALLOW_NOTICES.value)
 async def allow_notices(message: types.Message, state: FSMContext, user: User):
+    await state.set_state(NotificationStates.notification_type)
     btn = buttons._keyboard(NotificationTimeButtons)
     await message.answer("Выберите время для уведомлений", reply_markup=btn)
+
+
+@user_router.message(NotificationStates.notification_type)
+async def notification_type(message: types.Message, state: FSMContext, user: User):
+    user_repository = UserRepository()
+    match message.text:
+        case NotificationTimeButtons.MORNING_MESSAGE.value:
+            await user_repository.update_user(user.chat_id, notification_type=NotificationType.SIX_HOURS.value)
+        case NotificationTimeButtons.EVENING_MESSAGE.value:
+            await user_repository.update_user(user.chat_id, notification_type=NotificationType.SEVENTEEN_HOURS.value)
+        case NotificationTimeButtons.ALL_MESSAGES.value:
+            await user_repository.update_user(user.chat_id, notification_type=NotificationType.ALL_NOTICES.value)
+        case NotificationTimeButtons.UNSUBSCRIBE_FROM_ALL_MESSAGES.value:
+            await user_repository.update_user(user.chat_id, notification_type=None)
+    await state.clear()
+    await message.answer("Уведомления успешно подключены")
+    await start(message, state)
+
+
+@user_router.message(F.text == UserMenuButtons.CAMERAS.value)
+async def cameras(message: types.Message, state: FSMContext, user: User):
+    cameras_repository = CamerasRepository()
+    cameras = await cameras_repository.get_all_cameras()
+    btn = buttons.user_cameras_keyboard(cameras)
+    await message.answer("Выберите камеру", reply_markup=btn)
 
 
 # @user_router.message(F.text == UserMenuButtons.SETTINGS.value)
