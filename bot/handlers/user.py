@@ -55,7 +55,9 @@ async def state_now(message: types.Message, state: FSMContext, user: User):
     crossing_config_repository = CrossingConfigRepository()
     crossing_config = await crossing_config_repository.get_crossing_config()
     btn = buttons.user_crossing_config_links(crossing_config)
-    await message.answer(crossing_config.last_message, reply_markup=btn)
+    app_messages = await get_message_service()
+    text = await app_messages.get_current_message()
+    await message.answer(text, reply_markup=btn)
 
 
 @user_router.message(F.text == UserMenuButtons.ALLOW_NOTICES.value)

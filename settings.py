@@ -11,6 +11,12 @@ class Settings(BaseSettings):
     SETTINGS_FILE_PATH: str = "settings.xlsx"
     CHANNEL_ID: int
 
+    LATITUDE: float = 66.52
+    LONGITUDE: float = 66.61
+
+    WIND_SPEED_LIMIT: float = 17  # in m/s
+    VISIBILITY_LIMIT: float = 1000  # in meters
+
     model_config = SettingsConfigDict(env_file=".env")
 
     @field_validator("ADMIN_CHAT_ID", mode="before")

@@ -6,7 +6,6 @@ from openpyxl.worksheet.worksheet import Worksheet
 
 from bot.app import bot
 from bot.models.camera import Camera
-from bot.models.manager_link import ManagerLink
 from bot.models.message_template import MessageTemplate, MessageTemplateType
 from repository import MessageTemplatesRepository, CamerasRepository, CrossingConfigRepository
 from bot.models.crossing_config import CrossingMode, CrossingConfig
@@ -130,10 +129,6 @@ class ExcelSettings:
     #             await self.message_templates_repository.delete_message_template(
     #                 current_message_template_name
     #             )
-
-    async def _get_link(self, manager_link: ManagerLink):
-        tg_bot = await bot.get_me()
-        return f"https://t.me/{tg_bot.username}?start={manager_link.uuid}"
 
     async def get_excel_file(self):
         return FSInputFile(self.file_path)

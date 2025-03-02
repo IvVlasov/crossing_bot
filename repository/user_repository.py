@@ -26,6 +26,6 @@ class UserRepository(BaseRepository):
             chat_id=chat_id,
         )
 
-    async def get_users_with_notification_type(self, notification_type: NotificationType) -> list[User]:
-        result = await self.select_all(notification_type=notification_type)
+    async def get_all_users(self) -> list[User]:
+        result = await self.select_all()
         return [User(**row) for row in result]

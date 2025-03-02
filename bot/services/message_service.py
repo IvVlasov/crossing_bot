@@ -1,4 +1,6 @@
 from repository.messages import MessagesRepository
+from bot.services.weather_service import WeatherService
+from repository import CrossingConfigRepository
 
 
 class MessageService:
@@ -12,6 +14,14 @@ class MessageService:
         messages = await MessagesRepository().get_messages()
         for message in messages:
             setattr(self, message.key, message.text)
+
+    async def get_current_message(self) -> str:
+        weather_service = WeatherService()
+        crossing_config_repository = CrossingConfigRepository()
+        crossing_config = await crossing_config_repository.get_crossing_config()
+        weather_text = await weather_service.get_weather_text()
+        text = f"Последнее сообщение о переправе 🗒:\n{crossing_config.last_message}\n\nПогода в районе ⛅️:\n{weather_text}"
+        return text
 
 
 async def get_message_service() -> MessageService:
