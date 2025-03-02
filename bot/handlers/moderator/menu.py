@@ -6,14 +6,10 @@ from bot.handlers.filter import ModeratorFilter
 from bot.handlers.moderator import buttons as moderator_buttons
 from bot import buttons as user_buttons
 from bot.handlers.moderator.states import SendMessageStates
-from repository import CrossingConfigRepository, UserRepository
+from repository import CrossingConfigRepository, UserNoticeRepository
 from bot.models.crossing_config import CrossingMode
 from bot.models import NotificationType
-# from bot.handlers.moderator.states import SendMessageStates
-# from repository import CrossingRepository, UserCrossingsRepository
-# from bot.services.message_service import get_message_service
 from bot.app import bot
-# from bot.buttons import _inline_keyboard
 
 
 menu_router = Router()
@@ -73,8 +69,8 @@ async def close_crossing_message_confirm(callback: types.CallbackQuery, state: F
     text = data.get("text_to_send")
     crossing_config_repository = CrossingConfigRepository()
     await crossing_config_repository.update_crossing_config(last_message=text)
-    user_repository = UserRepository()
-    users = await user_repository.get_users_with_notification_type(NotificationType.ALL_NOTICES.value)
+    user_notice_repository = UserNoticeRepository()
+    users = await user_notice_repository.get_users_with_notification_type(NotificationType.ALL_NOTICES.value)
     for user in users:
         await bot.send_message(user.chat_id, text)
     await callback.message.delete()

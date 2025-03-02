@@ -15,15 +15,15 @@ from aiogram.enums.chat_type import ChatType
 appeal_router = Router()
 
 
-# @appeal_router.message(
-#     F.text.in_(
-#         [ModeratorMenuButtons.TECH_SUPPORT.value, UserMenuButtons.CALLBACK.value]
-#     )
-# )
-# async def appeal_message(message: types.Message, state: FSMContext):
-#     app_messages = await get_message_service()
-#     await message.answer(app_messages.appeal_message, reply_markup=types.ReplyKeyboardRemove())
-#     await state.set_state(AppealStates.appeal)
+@appeal_router.message(
+    F.text.in_(
+        [ModeratorMenuButtons.HELP.value, UserMenuButtons.HELP.value]
+    )
+)
+async def appeal_message(message: types.Message, state: FSMContext):
+    app_messages = await get_message_service()
+    await message.answer(app_messages.appeal_message, reply_markup=types.ReplyKeyboardRemove())
+    await state.set_state(AppealStates.appeal)
 
 
 @appeal_router.message(AppealStates.appeal)

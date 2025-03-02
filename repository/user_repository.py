@@ -8,8 +8,7 @@ class UserRepository(BaseRepository):
     async def create_table(self):
         create_table_query = f"""
             CREATE TABLE IF NOT EXISTS {self.table_name} (
-                chat_id BIGINT PRIMARY KEY,
-                notification_type TEXT DEFAULT NULL
+                chat_id BIGINT PRIMARY KEY
             )
         """
         await self.execute(create_table_query)

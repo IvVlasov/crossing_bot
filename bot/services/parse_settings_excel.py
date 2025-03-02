@@ -5,7 +5,6 @@ from aiogram.types.input_file import FSInputFile
 from openpyxl.worksheet.worksheet import Worksheet
 
 from bot.app import bot
-from bot.constants.buttons import ModeratorMessageTypes
 from bot.models.camera import Camera
 from bot.models.manager_link import ManagerLink
 from bot.models.message_template import MessageTemplate, MessageTemplateType
