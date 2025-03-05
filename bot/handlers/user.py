@@ -5,7 +5,7 @@ from bot.handlers.states import NotificationStates
 from bot import buttons
 from bot.constants import UserMenuButtons
 from bot.handlers.filter import ModeratorFilter
-from bot.models import User, UserNotice
+from bot.models import User, UserNotice, NotificationType
 from bot.services.message_service import get_message_service
 from repository import CrossingConfigRepository, UserRepository, CamerasRepository, UserNoticeRepository
 
@@ -69,6 +69,20 @@ async def allow_notices(message: types.Message, state: FSMContext, user: User):
     await message.answer("Включите или отключите уведомления", reply_markup=btn)
 
 
+async def switch_notification_type(
+    user_notice_repository: UserNoticeRepository,
+    user: User,
+    notification_type: NotificationType,
+    current_user_notice_types: list[NotificationType]
+):
+    if notification_type in current_user_notice_types:
+        await user_notice_repository.delete_user_notice(user.chat_id, notification_type)
+    else:
+        await user_notice_repository.create_user_notice(
+            UserNotice(chat_id=user.chat_id, notification_type=notification_type)
+        )
+
+
 @user_router.callback_query(NotificationStates.notification_type)
 async def notification_type(callback: types.CallbackQuery, state: FSMContext, user: User):
     user_notice_repository = UserNoticeRepository()
@@ -79,13 +93,18 @@ async def notification_type(callback: types.CallbackQuery, state: FSMContext, us
         case "unsubscribe_from_all_notices":
             for user_notice in current_user_notice:
                 await user_notice_repository.delete_user_notice(user.chat_id, user_notice.notification_type)
+        case NotificationType.ALL_NOTICES.value:
+            if NotificationType.ALL_NOTICES.value in current_user_notice_types:
+                return
+            for notification_type in NotificationType:
+                if notification_type not in current_user_notice_types:
+                    await user_notice_repository.create_user_notice(
+                        UserNotice(chat_id=user.chat_id, notification_type=notification_type)
+                    )
         case _:
-            if callback.data in current_user_notice_types:
-                await user_notice_repository.delete_user_notice(user.chat_id, callback.data)
-            else:
-                await user_notice_repository.create_user_notice(
-                    UserNotice(chat_id=user.chat_id, notification_type=callback.data)
-                )
+            if NotificationType.ALL_NOTICES.value in current_user_notice_types:
+                await user_notice_repository.delete_user_notice(user.chat_id, NotificationType.ALL_NOTICES.value)
+            await switch_notification_type(user_notice_repository, user, callback.data, current_user_notice_types)
 
     user_notices = await user_notice_repository.get_user_notices(user.chat_id)
     btn = buttons.notification_time_keyboard(user_notices)

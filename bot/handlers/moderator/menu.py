@@ -70,7 +70,7 @@ async def close_crossing_message_confirm(callback: types.CallbackQuery, state: F
     crossing_config_repository = CrossingConfigRepository()
     await crossing_config_repository.update_crossing_config(last_message=text)
     user_notice_repository = UserNoticeRepository()
-    users = await user_notice_repository.get_users_with_notification_type(NotificationType.ALL_NOTICES.value)
+    users = await user_notice_repository.get_users_with_notification_type(NotificationType.ABOUT_LIMIT.value)
     for user in users:
         await bot.send_message(user.chat_id, text)
     await callback.message.delete()
