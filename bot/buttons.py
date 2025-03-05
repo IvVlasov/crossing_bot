@@ -48,7 +48,7 @@ def manager_menu_keyboard():
 def user_cameras_keyboard(cameras: list[Camera]):
     builder = InlineKeyboardBuilder()
     for camera in cameras:
-        builder.button(text=camera.name, url=camera.camera_url)
+        builder.button(text=camera.name, callback_data=f"get_camera_{camera.id}")
     builder.button(text="Назад", callback_data="back_to_user_menu")
     builder.adjust(1)
     keyboard = builder.as_markup()

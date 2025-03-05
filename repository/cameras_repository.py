@@ -28,6 +28,10 @@ class CamerasRepository(BaseRepository):
     async def delete_camera(self, camera_name: str):
         await self.delete(name=camera_name)
 
+    async def get_camera_by_id(self, camera_id: int) -> Camera:
+        camera = await self.select_one(id=camera_id)
+        return Camera(**camera)
+
     # async def get_camera_by_id(self, camera_id: int) -> Camera:
     #     camera = await self.select_one(id=camera_id)
     #     return Camera(**camera)

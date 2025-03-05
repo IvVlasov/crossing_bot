@@ -1,7 +1,7 @@
 from aiogram import F, Router, types
 from aiogram.fsm.context import FSMContext
+from aiogram.types import LinkPreviewOptions
 from bot.handlers.states import NotificationStates
-
 from bot import buttons
 from bot.constants import UserMenuButtons
 from bot.handlers.filter import ModeratorFilter
@@ -117,3 +117,16 @@ async def cameras(message: types.Message, state: FSMContext, user: User):
     cameras = await cameras_repository.get_all_cameras()
     btn = buttons.user_cameras_keyboard(cameras)
     await message.answer("Выберите камеру", reply_markup=btn)
+
+
+@user_router.callback_query(F.data.startswith("get_camera_"))
+async def get_camera(callback: types.CallbackQuery, state: FSMContext, user: User):
+    camera_id = callback.data.split("_")[-1]
+    camera_repository = CamerasRepository()
+    camera = await camera_repository.get_camera_by_id(camera_id)
+    cameras = await camera_repository.get_all_cameras()
+    text = f"Ссылка на камеру {camera.name}:\n{camera.camera_url}"
+    btn = buttons.user_cameras_keyboard(cameras)
+    await callback.message.edit_text(
+        text=text, reply_markup=btn, link_preview_options=LinkPreviewOptions(is_disabled=False)
+    )
