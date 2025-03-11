@@ -6,10 +6,10 @@ from bot.handlers.filter import ModeratorFilter
 from bot.handlers.moderator import buttons as moderator_buttons
 from bot import buttons as user_buttons
 from bot.handlers.moderator.states import SendMessageStates
-from repository import CrossingConfigRepository, UserNoticeRepository
-from bot.models.crossing_config import CrossingMode
+from repository import CrossingConfigRepository, UserNoticeRepository, TemplatesRepository
 from bot.models import NotificationType
 from bot.app import bot
+from datetime import datetime
 
 
 menu_router = Router()
@@ -20,47 +20,64 @@ async def administration(message: types.Message, state: FSMContext):
     await state.set_state(SendMessageStates.crossing)
     crossing_config_repository = CrossingConfigRepository()
     crossing_config = await crossing_config_repository.get_crossing_config()
-    match crossing_config.crossing_mode:
-        case CrossingMode.WINTER:
-            text = "Движение по ледовой переправе Салехард-Лабытнанги открыто для автомобилей массой до:"
-            btn = moderator_buttons.winter_crossing_keyboard()
-        case CrossingMode.SUMMER:
-            text = "Переправа работает в обычном режиме, на линии _ паром(ов)"
-            btn = moderator_buttons.summer_crossing_keyboard()
-        case CrossingMode.INTERSEASON:
-            text = "На линии работают суда на воздушной подушке, задействовано ___ единиц."
-            btn = moderator_buttons.interseason_crossing_keyboard()
+    templates_repository = TemplatesRepository()
+    templates = await templates_repository.get_all_templates(crossing_config.crossing_mode)
+    btn = moderator_buttons.get_buttons_keyboard(templates)
+    text = "Выберите шаблон уведомления"
     await message.answer(text, reply_markup=btn)
 
 
-@menu_router.callback_query(ModeratorFilter(), F.data.startswith("winter_crossing_"), SendMessageStates.crossing)
-async def choose_winter_crossing(callback: types.CallbackQuery, state: FSMContext):
+async def send_preview_message(to_send: str, message: types.Message, state: FSMContext):
+    await state.update_data(text_to_send=to_send)
+    text = "Подтвердите отправку сообщения:\n\n"
+    text = text + to_send
+    await message.answer(text, reply_markup=moderator_buttons.confirm_keyboard())
+
+
+@menu_router.callback_query(ModeratorFilter(), F.data.startswith("select_template_"), SendMessageStates.crossing)
+async def choose_template(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.delete()
     value = callback.data.split("_")[-1]
-    await state.update_data(winter_crossing_value=value)
-    text = f"Движение по ледовой переправе Салехард-Лабытнанги открыто для автомобилей массой до: {value} тонн"
-    btn = moderator_buttons.confirm_keyboard()
-    await state.update_data(text_to_send=text)
-    await callback.message.answer(text, reply_markup=btn)
+    templates_repository = TemplatesRepository()
+    template = await templates_repository.get_template(id=value)
+    await state.update_data(template=template)
+    await state.set_state(SendMessageStates.template)
+    if template.buttons_list == "время":
+        text = 'Введите время в формате "12:00"'
+        await callback.message.answer(text, reply_markup=moderator_buttons.current_time_keyboard())
+    elif template.buttons_list:
+        btn = moderator_buttons.get_buttons_keyboard_for_template(template.buttons_list.split(","))
+        text = '\n\nВыберите вариант текста для заполнения шаблона'
+        await callback.message.answer(template.message + text, reply_markup=btn)
+    else:
+        await state.update_data(template=template)
+        await send_preview_message(template.message, callback.message, state)
 
 
-@menu_router.callback_query(ModeratorFilter(), F.data.startswith("summer_crossing_"), SendMessageStates.crossing)
-async def choose_summer_crossing(callback: types.CallbackQuery, state: FSMContext):
+@menu_router.message(ModeratorFilter(), SendMessageStates.template)
+async def choose_time(message: types.Message, state: FSMContext):
+    if message.text == "Текущее время":
+        time = datetime.now().strftime("%H:%M")
+    else:
+        try:
+            time = datetime.strptime(message.text, "%H:%M").strftime("%H:%M")
+        except ValueError:
+            await message.answer("Неверный формат времени. Введите время в формате '12:00'")
+            return
+    data = await state.get_data()
+    template = data.get("template")
+    text = template.message.replace("_", time)
+    await send_preview_message(text, message, state)
+
+
+@menu_router.callback_query(ModeratorFilter(), F.data.startswith("select_param_"), SendMessageStates.template)
+async def choose_param(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.delete()
     value = callback.data.split("_")[-1]
-    await state.update_data(summer_crossing_value=value)
-    text = f"Переправа работает в обычном режиме, на линии {value} паром(ов)"
-    btn = moderator_buttons.confirm_keyboard()
-    await state.update_data(text_to_send=text)
-    await callback.message.answer(text, reply_markup=btn)
-
-
-@menu_router.callback_query(ModeratorFilter(), F.data.startswith("interseason_crossing_"), SendMessageStates.crossing)
-async def choose_interseason_crossing(callback: types.CallbackQuery, state: FSMContext):
-    value = callback.data.split("_")[-1]
-    await state.update_data(interseason_crossing_value=value)
-    text = f"На линии работают суда на воздушной подушке, задействовано {value} единиц."
-    btn = moderator_buttons.confirm_keyboard()
-    await state.update_data(text_to_send=text)
-    await callback.message.answer(text, reply_markup=btn)
+    data = await state.get_data()
+    template = data.get("template")
+    to_send = template.message.replace("_", value)
+    await send_preview_message(to_send, callback.message, state)
 
 
 @menu_router.callback_query(F.data == "confirm_yes")

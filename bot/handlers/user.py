@@ -128,5 +128,8 @@ async def get_camera(callback: types.CallbackQuery, state: FSMContext, user: Use
     text = f"Ссылка на камеру {camera.name}:\n{camera.camera_url}"
     btn = buttons.user_cameras_keyboard(cameras)
     await callback.message.edit_text(
-        text=text, reply_markup=btn, link_preview_options=LinkPreviewOptions(is_disabled=False)
+        text=text, reply_markup=btn, link_preview_options=LinkPreviewOptions(
+            url=camera.camera_url,
+            is_disabled=False
+        )
     )

@@ -1,38 +1,32 @@
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 
 from bot.constants.base import AppStringEnum
+from bot.models.template import Template
 
 
-def winter_crossing_keyboard():
+def current_time_keyboard():
+    builder = ReplyKeyboardBuilder()
+    builder.button(text="Текущее время")
+    builder.adjust(1)
+    keyboard = builder.as_markup()
+    keyboard.resize_keyboard = True
+    keyboard.one_time_keyboard = True
+    return keyboard
+
+
+def get_buttons_keyboard(buttons: list[Template]):
     builder = InlineKeyboardBuilder()
-    builder.button(text="30 тонн", callback_data="winter_crossing_30")
-    builder.button(text="25 тонн", callback_data="winter_crossing_25")
-    builder.button(text="15 тонн", callback_data="winter_crossing_15")
-    builder.button(text="5 тонн", callback_data="winter_crossing_5")
-    builder.button(text="3,5 тонны", callback_data="winter_crossing_3_5")
+    for button in buttons:
+        builder.button(text=button.button_name, callback_data=f"select_template_{button.id}")
     builder.adjust(1)
     keyboard = builder.as_markup()
     return keyboard
 
 
-def summer_crossing_keyboard():
+def get_buttons_keyboard_for_template(buttons: list[str]):
     builder = InlineKeyboardBuilder()
-    builder.button(text="1", callback_data="summer_crossing_1")
-    builder.button(text="2", callback_data="summer_crossing_2")
-    builder.button(text="3", callback_data="summer_crossing_3")
-    builder.button(text="4", callback_data="summer_crossing_4")
-    builder.button(text="6", callback_data="summer_crossing_6")
-    builder.adjust(1)
-    keyboard = builder.as_markup()
-    return keyboard
-
-
-def interseason_crossing_keyboard():
-    builder = InlineKeyboardBuilder()
-    builder.button(text="1", callback_data="interseason_crossing_1")
-    builder.button(text="2", callback_data="interseason_crossing_2")
-    builder.button(text="3", callback_data="interseason_crossing_3")
-    builder.button(text="4", callback_data="interseason_crossing_4")
+    for button in buttons:
+        builder.button(text=button, callback_data=f"select_param_{button.strip()}")
     builder.adjust(1)
     keyboard = builder.as_markup()
     return keyboard
