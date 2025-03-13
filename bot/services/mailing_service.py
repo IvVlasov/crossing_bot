@@ -5,6 +5,9 @@ from bot.app import bot
 from bot.models import NotificationType
 from bot.services.message_service import get_message_service
 from bot.models.crossing_config import CrossingMode
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class MailingService:
@@ -27,6 +30,7 @@ class MailingService:
 
     async def check_weather(self):
         current_weather = await self.weather_service.get_current_weather()
+        logger.info(f"current_weather: {current_weather}")
         if self.settings.WIND_SPEED_LIMIT < current_weather.wind_speed_ms:
             users = await self.user_repository.get_all_users()
             for user in users:

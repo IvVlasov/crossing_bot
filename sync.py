@@ -2,9 +2,13 @@ from bot.services.mailing_service import MailingService
 import asyncio
 from datetime import datetime
 from bot.models import NotificationType
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 async def sync():
+    logger.info("Syncing")
     now = datetime.now()
     mailing_service = MailingService()
 
