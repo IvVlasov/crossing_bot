@@ -91,6 +91,11 @@ class BaseRepository:
             await db.execute(f"DELETE FROM {self.table_name} WHERE {where_conditions}")
             await db.commit()
 
+    async def delete_all(self):
+        async with aiosqlite.connect(self.db_path) as db:
+            await db.execute(f"DELETE FROM {self.table_name}")
+            await db.commit()
+
     @abstractmethod
     async def create_table(self):
         """

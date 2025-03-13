@@ -22,6 +22,4 @@ class CrossingMode(AppStringEnum):
 class CrossingConfig(BaseModel):
     id: int = Field(default=1)
     last_message: str
-    routing_link: str
-    aviacommunication_link: str
     crossing_mode: CrossingMode

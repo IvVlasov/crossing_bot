@@ -7,11 +7,23 @@ from aiogram import types
 from bot.constants.base import AppStringEnum
 from bot.models.camera import Camera
 from bot.models.user_notice import UserNotice, NotificationType
+from bot.models.crossing_config import CrossingMode
+from bot.models.crossing_config_buttons import CrossingConfigButtons
 
 
-def admin_menu_keyboard():
+crossings_types = {
+    CrossingMode.SUMMER: "Летний",
+    CrossingMode.WINTER: "Зимний",
+    CrossingMode.INTERSEASON: "Межсезонье",
+}
+
+
+def admin_menu_keyboard(crossing_config: CrossingConfig):
     builder = InlineKeyboardBuilder()
-    builder.button(text="Настройки", callback_data="settings")
+    for k, v in crossings_types.items():
+        txt = "✅" if k == crossing_config.crossing_mode == k else "❌"
+        builder.button(text=f"{v} {txt}", callback_data=f"set_crossing_type_{k}")
+    builder.button(text="Файл настроек", callback_data="settings")
 
     builder.adjust(1)
     keyboard = builder.as_markup()
@@ -55,10 +67,14 @@ def user_cameras_keyboard(cameras: list[Camera]):
     return keyboard
 
 
-def user_crossing_config_links(crossing_config: CrossingConfig):
+def user_crossing_config_links(crossing_config: CrossingConfig, crossing_config_buttons: list[CrossingConfigButtons]):
     builder = InlineKeyboardBuilder()
-    builder.button(text="Маршрутный транспорт", url=crossing_config.routing_link)
-    builder.button(text="Авиасообщение", url=crossing_config.aviacommunication_link)
+    for button in crossing_config_buttons:
+        if button.crossing_mode == crossing_config.crossing_mode:
+            if button.button_value.startswith("http"):
+                builder.button(text=button.button_name, url=button.button_value)
+            else:
+                builder.button(text=button.button_name, callback_data=f"send_cros_btn_message_{button.id}")
     builder.button(text="Назад", callback_data="back_to_user_menu")
     builder.adjust(1)
     keyboard = builder.as_markup()

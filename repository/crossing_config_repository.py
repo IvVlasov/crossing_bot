@@ -10,16 +10,12 @@ class CrossingConfigRepository(BaseRepository):
             CREATE TABLE IF NOT EXISTS {self.table_name} (
                 id INTEGER PRIMARY KEY,
                 last_message TEXT,
-                routing_link TEXT,
-                aviacommunication_link TEXT,
                 crossing_mode TEXT
             )
         """
         await self.execute(create_table_query)
         await self.insert(id=1,
                           last_message="Пустое сообщение",
-                          routing_link="https://www.google.com/",
-                          aviacommunication_link="https://ya.ru/",
                           crossing_mode=CrossingMode.SUMMER)
 
     async def update_crossing_config(self, **kwargs):

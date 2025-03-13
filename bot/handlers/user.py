@@ -7,7 +7,13 @@ from bot.constants import UserMenuButtons
 from bot.handlers.filter import ModeratorFilter
 from bot.models import User, UserNotice, NotificationType
 from bot.services.message_service import get_message_service
-from repository import CrossingConfigRepository, UserRepository, CamerasRepository, UserNoticeRepository
+from repository import (
+    CrossingConfigRepository,
+    UserRepository,
+    CamerasRepository,
+    UserNoticeRepository,
+    CrossingConfigButtonsRepository,
+)
 
 user_router = Router()
 
@@ -53,11 +59,22 @@ async def back_to_user_menu(callback: types.CallbackQuery, state: FSMContext):
 @user_router.message(F.text == UserMenuButtons.STATE_NOW.value)
 async def state_now(message: types.Message, state: FSMContext, user: User):
     crossing_config_repository = CrossingConfigRepository()
+    crossing_config_buttons_repository = CrossingConfigButtonsRepository()
     crossing_config = await crossing_config_repository.get_crossing_config()
-    btn = buttons.user_crossing_config_links(crossing_config)
+    crossing_config_buttons = await crossing_config_buttons_repository.get_crossing_config_buttons()
+    btn = buttons.user_crossing_config_links(crossing_config, crossing_config_buttons)
     app_messages = await get_message_service()
     text = await app_messages.get_current_message()
     await message.answer(text, reply_markup=btn)
+
+
+@user_router.callback_query(F.data.startswith("send_cros_btn_message_"))
+async def send_cros_btn_message(callback: types.CallbackQuery, state: FSMContext):
+    crossing_config_buttons_repository = CrossingConfigButtonsRepository()
+    crossing_config_button = await crossing_config_buttons_repository.get_crossing_config_button(
+        int(callback.data.split("_")[-1])
+    )
+    await callback.message.answer(crossing_config_button.button_value)
 
 
 @user_router.message(F.text == UserMenuButtons.ALLOW_NOTICES.value)

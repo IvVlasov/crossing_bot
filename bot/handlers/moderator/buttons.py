@@ -18,6 +18,7 @@ def get_buttons_keyboard(buttons: list[Template]):
     builder = InlineKeyboardBuilder()
     for button in buttons:
         builder.button(text=button.button_name, callback_data=f"select_template_{button.id}")
+    builder.button(text="Назад", callback_data="back_to_user_menu")
     builder.adjust(1)
     keyboard = builder.as_markup()
     return keyboard
@@ -27,6 +28,7 @@ def get_buttons_keyboard_for_template(buttons: list[str]):
     builder = InlineKeyboardBuilder()
     for button in buttons:
         builder.button(text=button, callback_data=f"select_param_{button.strip()}")
+    builder.button(text="Назад", callback_data="back_to_user_menu")
     builder.adjust(1)
     keyboard = builder.as_markup()
     return keyboard

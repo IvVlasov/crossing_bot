@@ -29,8 +29,7 @@ class TemplatesRepository(BaseRepository):
         await self.create_if_not_exists(Template(crossing_mode="interseason", button_name="Подушка закрыта из-за погоды", message="Суда на воздушной подушке временно приостановили свою работу по погодным условиям.", buttons_list=None))
         await self.create_if_not_exists(Template(crossing_mode="interseason", button_name="Подушка закрыта", message="Суда на воздушной подушке временно приостановили свою работу.", buttons_list=None))
 
-    async def create_or_update_template(self, template: Template):
-        await self.delete(button_name=template.button_name)
+    async def create_template(self, template: Template):
         await self.insert(
             crossing_mode=template.crossing_mode,
             button_name=template.button_name,
@@ -47,6 +46,9 @@ class TemplatesRepository(BaseRepository):
                 message=template.message,
                 buttons_list=template.buttons_list,
             )
+
+    async def delete_all_templates(self):
+        await self.delete_all()
 
     async def get_all_templates(self, crossing_mode: CrossingMode) -> list[Template]:
         templates = await self.select_all(crossing_mode=crossing_mode.value)

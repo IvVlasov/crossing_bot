@@ -8,6 +8,7 @@ from repository.messages import MessagesRepository
 from repository.crossing_config_repository import CrossingConfigRepository
 from repository.user_notice_repository import UserNoticeRepository
 from repository.templates_repository import TemplatesRepository
+from repository.crossing_config_buttons_repository import CrossingConfigButtonsRepository
 
 
 async def create_tables():
@@ -20,6 +21,7 @@ __all__ = [
     "UserRepository",
     "AppealRepository",
     "CamerasRepository",
+    "CrossingConfigButtonsRepository",
     "BaseRepository",
     "MessagesRepository",
     "TemplatesRepository",
