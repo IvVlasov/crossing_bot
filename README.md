@@ -37,6 +37,21 @@ TZ=... (таймзона, например Asia/Yekaterinburg)
 
 ## Запуск в контейнере
 
+Установите докер по инструкции:
+https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository
+
+
+> docker build -t crossing_img .
+
+> docker run \
+	--name crossing_bot \
+	-e BOT_TOKEN= \
+	-e ADMIN_CHAT_ID= \
+	-e CHANNEL_ID= \
+	-e TZ=Asia/Yekaterinburg \
+	-d crossing_img
+
+
 ## Запуск на сервере
 
 Убедитесь, что сервер использует ОС Ubuntu 20.04 или 22.04
