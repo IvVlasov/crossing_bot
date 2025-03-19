@@ -1,3 +1,4 @@
+import random
 from aiogram import F, Router, types
 from aiogram.fsm.context import FSMContext
 from aiogram.types import LinkPreviewOptions
@@ -146,7 +147,7 @@ async def get_camera(callback: types.CallbackQuery, state: FSMContext, user: Use
     btn = buttons.user_cameras_keyboard(cameras)
     await callback.message.edit_text(
         text=text, reply_markup=btn, link_preview_options=LinkPreviewOptions(
-            url=camera.camera_url,
+            url=camera.camera_url + "?random_param=" + str(random.randint(1, 1000000)),
             is_disabled=False
         )
     )

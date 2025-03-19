@@ -60,7 +60,7 @@ def manager_menu_keyboard():
 def user_cameras_keyboard(cameras: list[Camera]):
     builder = InlineKeyboardBuilder()
     for camera in cameras:
-        builder.button(text=camera.name, callback_data=f"get_camera_{camera.id}")
+        builder.button(text=f"{camera.num}. {camera.name}", callback_data=f"get_camera_{camera.id}")
     builder.button(text="Назад", callback_data="back_to_user_menu")
     builder.adjust(1)
     keyboard = builder.as_markup()
@@ -85,7 +85,7 @@ def notification_time_keyboard(user_notices: list[UserNotice]):
     user_notice_types = [user_notice.notification_type for user_notice in user_notices]
     builder = InlineKeyboardBuilder()
     for user_notice in NotificationType:
-        emoji = "✅" if user_notice in user_notice_types else "❌"
+        emoji = "✅" if user_notice in user_notice_types else ""
         builder.button(text=f"{user_notice.ru_name} {emoji}", callback_data=f"{user_notice.value}")
     builder.button(text="Отписаться от всех уведомлений", callback_data="unsubscribe_from_all_notices")
     builder.button(text="Назад", callback_data="back_to_user_menu")

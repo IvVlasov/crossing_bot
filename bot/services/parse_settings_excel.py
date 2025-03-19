@@ -60,19 +60,12 @@ class ExcelSettings:
             await messages_repository.create_message(message)
 
     async def save_cameras(self, sheet_obj: Worksheet):
-        current_cameras = await self.cameras_repository.get_all_cameras()
-        current_cameras_names = [camera.name for camera in current_cameras]
-        config_cameras_names = []
+        await self.cameras_repository.delete_all_cameras()
         for row in sheet_obj.iter_rows(min_row=2, values_only=True):
-            if row[0] is None:
+            if row[1] is None:
                 continue
-            camera = Camera(name=row[0], camera_url=row[1])
-            config_cameras_names.append(camera.name)
-            await self.cameras_repository.create_or_update_camera(camera)
-
-        for current_camera_name in current_cameras_names:
-            if current_camera_name not in current_cameras_names:
-                await self.cameras_repository.delete_camera(current_camera_name)
+            camera = Camera(num=row[0], name=row[1], camera_url=row[2])
+            await self.cameras_repository.create_camera(camera)
 
     async def save_static_message_templates(self, sheet_obj: Worksheet):
         await self.templates_repository.delete_all_templates()
