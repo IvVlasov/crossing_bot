@@ -1,0 +1,13 @@
+[Unit]
+Description=Pereprava bot service
+After=network.target
+
+[Service]
+User=root
+Type=simple
+WorkingDirectory=/root/crossing_bot
+ExecStart=/root/crossing_bot/env/bin/python /root/crossing_bot/main.py
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
