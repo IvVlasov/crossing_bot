@@ -23,3 +23,4 @@ class CrossingConfig(BaseModel):
     id: int = Field(default=1)
     last_message: str
     crossing_mode: CrossingMode
+    last_message_date: str
