@@ -11,7 +11,7 @@ class NotificationType(AppStringEnum):
     @property
     def ru_name(self):
         if self == NotificationType.ABOUT_LIMIT:
-            return "Об ограничениях"
+            return "Об ограничениях работы"
         elif self == NotificationType.SIX_HOURS:
             return "Уведомлять в 06:00"
         elif self == NotificationType.SEVENTEEN_HOURS:

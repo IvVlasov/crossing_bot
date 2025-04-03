@@ -30,5 +30,5 @@ class WeatherService:
         weather = await self.get_current_weather()
         result += f"🌡 Температура: {weather.temperature}°C\n"
         result += f"💨 Скорость ветра: {weather.wind_speed_ms} м/с\n"
-        result += f"👀 Видимость: {weather.visibility} м\n"
+        # result += f"👀 Видимость: {weather.visibility} м\n"
         return result

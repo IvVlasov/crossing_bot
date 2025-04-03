@@ -16,7 +16,7 @@ from repository import (
 )
 import os.path
 from aiogram.types import FSInputFile
-
+from aiogram.utils.markdown import hlink
 
 user_router = Router()
 
@@ -145,14 +145,15 @@ async def get_camera(callback: types.CallbackQuery, state: FSMContext, user: Use
     camera_repository = CamerasRepository()
     camera = await camera_repository.get_camera_by_id(camera_id)
     cameras = await camera_repository.get_all_cameras()
-    text = f"Ссылка на камеру {camera.name}:\n{camera.camera_url}"
     btn = buttons.user_cameras_keyboard(cameras)
-
+    c_name = f"[{camera.name.strip()}]({camera.camera_url.strip()})"
+    text = f"Ссылка на камеру {c_name}"
     if os.path.isfile(f"static/cameras/{camera.num}.png"):
         await callback.message.answer_photo(
             photo=FSInputFile(f"static/cameras/{camera.num}.png"),
             caption=text, reply_markup=btn,
+            parse_mode="MarkdownV2"
         )
     else:
-        await callback.message.answer(text, reply_markup=btn)
+        await callback.message.answer(text, reply_markup=btn, parse_mode="MarkdownV2")
     await callback.message.edit_reply_markup(reply_markup=InlineKeyboardMarkup(inline_keyboard=[]))

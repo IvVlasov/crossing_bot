@@ -20,7 +20,7 @@ class MessageService:
         crossing_config_repository = CrossingConfigRepository()
         crossing_config = await crossing_config_repository.get_crossing_config()
         weather_text = await weather_service.get_weather_text()
-        text = f"От {crossing_config.last_message_date}\n{crossing_config.last_message}\n\nПогода ⛅️:\n{weather_text}"
+        text = f"{crossing_config.last_message}\n\nПогода ⛅️:\n{weather_text}"
         return text
 
 
