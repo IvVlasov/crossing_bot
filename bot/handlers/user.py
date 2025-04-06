@@ -137,7 +137,7 @@ async def cameras(message: types.Message, state: FSMContext, user: User):
     cameras = await cameras_repository.get_all_cameras()
     btn = buttons.user_cameras_keyboard(cameras)
     await message.answer_photo(
-        photo=FSInputFile(f"static/cameras/all.jpg"),
+        photo=FSInputFile("static/cameras/all.jpg"),
         caption="Выберите камеру", reply_markup=btn,
         parse_mode="MarkdownV2"
     )
@@ -152,7 +152,7 @@ async def get_camera(callback: types.CallbackQuery, state: FSMContext, user: Use
     btn = buttons.user_cameras_keyboard(cameras)
     c_name = f"[{camera.name.strip()}]({camera.camera_url.strip()})"
     text = f"Ссылка на камеру {c_name}"
-    if os.path.isfile(f"static/cameras/{camera.num}.png"):
+    if os.path.isfile(f"static/cameras/{camera.num}.jpg"):
         await callback.message.answer_photo(
             photo=FSInputFile(f"static/cameras/{camera.num}.jpg"),
             caption=text, reply_markup=btn,
