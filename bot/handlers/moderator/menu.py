@@ -10,6 +10,7 @@ from repository import CrossingConfigRepository, UserNoticeRepository, Templates
 from bot.models import NotificationType
 from bot.app import bot
 from datetime import datetime
+from settings import get_settings
 
 
 menu_router = Router()
@@ -82,6 +83,7 @@ async def choose_param(callback: types.CallbackQuery, state: FSMContext):
 
 @menu_router.callback_query(F.data == "confirm_yes")
 async def close_crossing_message_confirm(callback: types.CallbackQuery, state: FSMContext):
+    settings = get_settings()
     data = await state.get_data()
     text = data.get("text_to_send")
     crossing_config_repository = CrossingConfigRepository()
@@ -94,6 +96,10 @@ async def close_crossing_message_confirm(callback: types.CallbackQuery, state: F
     await state.clear()
     btn = await user_buttons.user_menu_keyboard(callback.message)
     await callback.message.answer("Сообщение отправлено", reply_markup=btn)
+    manager_text = (
+        "Пользователь ID: %s Username: @%s \nОтправил сообщение:\n\n%s"
+    ) % (callback.message.chat.id, callback.message.chat.username, text)
+    await bot.send_message(settings.MANAGER_CHAT_ID, manager_text)
 
 
 @menu_router.callback_query(F.data == "confirm_no")

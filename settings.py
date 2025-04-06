@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     ADMIN_CHAT_ID: int = 0
     SETTINGS_FILE_PATH: str = "settings.xlsx"
     CHANNEL_ID: int
+    MANAGER_CHAT_ID: int
 
     LATITUDE: float = 66.52
     LONGITUDE: float = 66.61

@@ -21,7 +21,7 @@ class CamerasRepository(BaseRepository):
 
     async def get_all_cameras(self) -> list[Camera]:
         cameras = await self.select_all()
-        return [Camera(**camera) for camera in cameras]
+        return sorted([Camera(**camera) for camera in cameras], key=lambda x: x.num)
 
     async def delete_camera(self, camera_name: str):
         await self.delete(name=camera_name)
