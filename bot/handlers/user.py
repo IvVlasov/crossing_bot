@@ -16,7 +16,7 @@ from repository import (
 )
 import os.path
 from aiogram.types import FSInputFile
-from aiogram.utils.markdown import hlink
+import re
 
 user_router = Router()
 
@@ -77,7 +77,16 @@ async def send_cros_btn_message(callback: types.CallbackQuery, state: FSMContext
     crossing_config_button = await crossing_config_buttons_repository.get_crossing_config_button(
         int(callback.data.split("_")[-1])
     )
-    await callback.message.answer(crossing_config_button.button_value)
+
+    def replacer(match):
+        label = match.group(1)
+        url = match.group(2)
+        res = f'<a href="{url}">{label}</>'
+        print(res)
+        return res
+
+    text = re.sub(r'\[(.*?)\]\((.*?)\)', replacer, crossing_config_button.button_value)
+    await callback.message.answer(text, parse_mode="HTML", disable_web_page_preview=True)
 
 
 @user_router.message(F.text == UserMenuButtons.ALLOW_NOTICES.value)
