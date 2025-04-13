@@ -18,7 +18,8 @@ async def sync():
     if now.hour == 17 and now.minute == 0:
         await mailing_service.send_notification(NotificationType.SEVENTEEN_HOURS)
 
-    await mailing_service.check_weather()
+    if now.hour > 5:
+        await mailing_service.check_weather()
 
 
 if __name__ == "__main__":

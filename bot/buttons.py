@@ -9,6 +9,7 @@ from bot.models.camera import Camera
 from bot.models.user_notice import UserNotice, NotificationType
 from bot.models.crossing_config import CrossingMode
 from bot.models.crossing_config_buttons import CrossingConfigButtons
+from bot.services.contact_service import ContactService
 
 
 crossings_types = {
@@ -33,12 +34,19 @@ def admin_menu_keyboard(crossing_config: CrossingConfig):
 async def user_menu_keyboard(message: types.Message):
     moderator_filter = ModeratorFilter()
     is_moderator = await moderator_filter(message)
+    contact_service = ContactService()
+    contact_crossing_config_btn = await contact_service.get_contact_crossing_config_btn()
+    is_contact_enabled = contact_crossing_config_btn is not None
     if is_moderator:
-        return manager_menu_keyboard()
+        return manager_menu_keyboard(is_contact_enabled)
     builder = ReplyKeyboardBuilder()
 
     for button in UserMenuButtons:
-        builder.button(text=button.value)
+        if button == UserMenuButtons.CONTACTS:
+            if is_contact_enabled:
+                builder.button(text=button.value)
+        else:
+            builder.button(text=button.value)
     builder.adjust(1)
     keyboard = builder.as_markup()
     keyboard.resize_keyboard = True
@@ -46,10 +54,14 @@ async def user_menu_keyboard(message: types.Message):
     return keyboard
 
 
-def manager_menu_keyboard():
+def manager_menu_keyboard(is_contact_enabled: bool):
     builder = ReplyKeyboardBuilder()
     for button in ModeratorMenuButtons:
-        builder.button(text=button.value)
+        if button == ModeratorMenuButtons.CONTACTS:
+            if is_contact_enabled:
+                builder.button(text=button.value)
+        else:
+            builder.button(text=button.value)
     builder.adjust(1)
     keyboard = builder.as_markup()
     keyboard.resize_keyboard = True
@@ -67,14 +79,13 @@ def user_cameras_keyboard(cameras: list[Camera]):
     return keyboard
 
 
-def user_crossing_config_links(crossing_config: CrossingConfig, crossing_config_buttons: list[CrossingConfigButtons]):
+def user_crossing_config_links(crossing_config_buttons: list[CrossingConfigButtons]):
     builder = InlineKeyboardBuilder()
     for button in crossing_config_buttons:
-        if button.crossing_mode == crossing_config.crossing_mode:
-            if button.button_value.startswith("http"):
-                builder.button(text=button.button_name, url=button.button_value)
-            else:
-                builder.button(text=button.button_name, callback_data=f"send_cros_btn_message_{button.id}")
+        if button.button_value.startswith("http"):
+            builder.button(text=button.button_name, url=button.button_value)
+        else:
+            builder.button(text=button.button_name, callback_data=f"send_cros_btn_message_{button.id}")
     builder.button(text="Назад", callback_data="back_to_user_menu")
     builder.adjust(1)
     keyboard = builder.as_markup()

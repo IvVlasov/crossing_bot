@@ -6,6 +6,7 @@ from bot.models import NotificationType
 from bot.services.message_service import get_message_service
 from bot.models.crossing_config import CrossingMode
 import logging
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -48,4 +49,4 @@ class MailingService:
         users = await self.user_notice_repository.get_users_with_notification_type(notification_type)
         for user in users:
             text = await message_service.get_current_message()
-            await bot.send_message(user.chat_id, text)
+            await bot.send_message(user.chat_id, text, parse_mode="HTML")

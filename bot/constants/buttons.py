@@ -5,6 +5,7 @@ class UserMenuButtons(AppStringEnum):
     STATE_NOW = "Текущая информация о переправе"
     ALLOW_NOTICES = "Подключить уведомления"
     CAMERAS = "Онлайн камеры"
+    CONTACTS = "Контакты"
     HELP = "Техподдержка"
 
 
@@ -13,4 +14,5 @@ class ModeratorMenuButtons(AppStringEnum):
     STATE_NOW = "Текущая информация о переправе"
     ALLOW_NOTICES = "Подключить уведомления"
     CAMERAS = "Онлайн камеры"
+    CONTACTS = "Контакты"
     HELP = "Техподдержка"

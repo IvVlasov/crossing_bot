@@ -17,6 +17,8 @@ from repository import (
 import os.path
 from aiogram.types import FSInputFile
 import re
+from bot.services.contact_service import ContactService
+
 
 user_router = Router()
 
@@ -61,32 +63,32 @@ async def back_to_user_menu(callback: types.CallbackQuery, state: FSMContext):
 
 @user_router.message(F.text == UserMenuButtons.STATE_NOW.value)
 async def state_now(message: types.Message, state: FSMContext, user: User):
-    crossing_config_repository = CrossingConfigRepository()
-    crossing_config_buttons_repository = CrossingConfigButtonsRepository()
-    crossing_config = await crossing_config_repository.get_crossing_config()
-    crossing_config_buttons = await crossing_config_buttons_repository.get_crossing_config_buttons()
-    btn = buttons.user_crossing_config_links(crossing_config, crossing_config_buttons)
+    contact_service = ContactService()
+    crossing_config_buttons = await contact_service.get_crossing_config_buttons()
+    btn = buttons.user_crossing_config_links(crossing_config_buttons)
     app_messages = await get_message_service()
     text = await app_messages.get_current_message()
-    await message.answer(text, reply_markup=btn)
+    await message.answer(text, reply_markup=btn, parse_mode="HTML")
+
+
+@user_router.message(F.text == UserMenuButtons.CONTACTS.value)
+async def get_contact_crossing_config(message: types.Message, state: FSMContext, user: User):
+    contact_service = ContactService()
+    contact_crossing_config_btn = await contact_service.get_contact_crossing_config_btn()
+    if contact_crossing_config_btn:
+        html_text = await contact_service.get_html_btn_text(contact_crossing_config_btn.id)
+        await message.answer(html_text, parse_mode="HTML",
+                             reply_markup=await buttons.user_menu_keyboard(message),
+                             disable_web_page_preview=True)
+    else:
+        await back_to_user_menu_reply(message, state)
 
 
 @user_router.callback_query(F.data.startswith("send_cros_btn_message_"))
 async def send_cros_btn_message(callback: types.CallbackQuery, state: FSMContext):
-    crossing_config_buttons_repository = CrossingConfigButtonsRepository()
-    crossing_config_button = await crossing_config_buttons_repository.get_crossing_config_button(
-        int(callback.data.split("_")[-1])
-    )
-
-    def replacer(match):
-        label = match.group(1)
-        url = match.group(2)
-        res = f'<a href="{url}">{label}</>'
-        print(res)
-        return res
-
-    text = re.sub(r'\[(.*?)\]\((.*?)\)', replacer, crossing_config_button.button_value)
-    await callback.message.answer(text, parse_mode="HTML", disable_web_page_preview=True)
+    contact_service = ContactService()
+    html_text = await contact_service.get_html_btn_text(int(callback.data.split("_")[-1]))
+    await callback.message.answer(html_text, parse_mode="HTML", disable_web_page_preview=True)
 
 
 @user_router.message(F.text == UserMenuButtons.ALLOW_NOTICES.value)
