@@ -25,7 +25,7 @@ def admin_menu_keyboard(crossing_config: CrossingConfig):
         txt = "✅" if k == crossing_config.crossing_mode == k else "❌"
         builder.button(text=f"{v} {txt}", callback_data=f"set_crossing_type_{k}")
     builder.button(text="Файл настроек", callback_data="settings")
-
+    builder.button(text="Статистика", callback_data="statistics")
     builder.adjust(1)
     keyboard = builder.as_markup()
     return keyboard

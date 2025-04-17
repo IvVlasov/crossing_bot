@@ -7,6 +7,8 @@ from bot.app import bot
 from bot.services.parse_settings_excel import ExcelSettings
 from settings import get_settings
 from repository import CrossingConfigRepository
+from bot.services.statistic_service import StatisticService
+
 
 admin_router = Router()
 settings = get_settings()
@@ -34,6 +36,13 @@ async def get_settings(callback: types.CallbackQuery, state: FSMContext):
     parse_settings_excel = ExcelSettings()
     document_file = await parse_settings_excel.get_excel_file()
     await callback.message.answer_document(document=document_file, caption=text)
+
+
+@admin_router.callback_query(AdminFilter(), F.data == "statistics")
+async def get_statistics(callback: types.CallbackQuery, state: FSMContext):
+    statistic_service = StatisticService()
+    statistics = await statistic_service.get_statistics_excel_file()
+    await callback.message.answer_document(document=statistics, caption="Выгрузка статистики")
 
 
 @admin_router.callback_query(AdminFilter(), F.data.startswith("set_crossing_type_"))

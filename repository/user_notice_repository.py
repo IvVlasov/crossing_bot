@@ -28,3 +28,8 @@ class UserNoticeRepository(BaseRepository):
     async def get_users_with_notification_type(self, notification_type: NotificationType) -> list[User]:
         result = await self.select_all(notification_type=notification_type)
         return [User(**row) for row in result]
+
+    async def get_all_users_with_notification_type(self) -> list[User]:
+        query = """SELECT distinct chat_id FROM user_notices"""
+        result = await self.execute_fetchall(query)
+        return [User(chat_id=row['chat_id']) for row in result]
